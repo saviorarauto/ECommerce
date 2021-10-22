@@ -1,139 +1,129 @@
-﻿using ECommerce.Classes;
-using ECommerce.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Web;
 using System.Web.Mvc;
+using ECommerce.Classes;
+using ECommerce.Models;
 
 namespace ECommerce.Controllers
 {
-    public class CitiesController : Controller
+    public class CompaniesController : Controller
     {
         private ECommerceContext db = new ECommerceContext();
 
-        // GET: Cities
+        // TAREFA DE CASA... TENTAR FAZER UMA LISTA DE OUTRA LISTA
+        //A LISTA DE CIDADES TEM Q MUDAR DE ACORDO COM A MINHA LISTA DE DEPARTMENT
+
+        // GET: Companies
         public ActionResult Index()
         {
-            var cities = db.Cities.Include(c => c.Department);
-            return View(cities.ToList());
+            var companies = db.Companies.Include(c => c.Cities).Include(c => c.Departments);
+            return View(companies.ToList());
         }
 
-        // GET: Cities/Details/5
+        // GET: Companies/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            City city = db.Cities.Find(id);
-            if (city == null)
+            Company company = db.Companies.Find(id);
+            if (company == null)
             {
                 return HttpNotFound();
             }
-            return View(city);
+            return View(company);
         }
 
-        // GET: Cities/Create
+        // GET: Companies/Create
         public ActionResult Create()
         {
-            /*var dep = db.Departments.ToList();
-            dep.Add(new Department
-            {
-                DepartmentId = 0,
-                Name = "[ Select a Department ]"
-            });
-            //dep = dep.OrderBy(d => d.Name).ToList();
-            ViewBag.DepartmentId = new SelectList(dep.OrderBy(d => d.Name).ToList(), "DepartmentId", "Name");
-            */
             ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name");
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name");
             return View();
         }
 
-        // POST: Cities/Create
+        // POST: Companies/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CityId,Name,DepartmentId")] City city)
+        public ActionResult Create([Bind(Include = "CompanytId,Name,Phone,Address,Logo,DepartmentId,CityId")] Company company)
         {
             if (ModelState.IsValid)
             {
-                db.Cities.Add(city);
+                db.Companies.Add(company);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-
-            //ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "Name", city.DepartmentId);
-            /*return View(city);
-            var dep = db.Departments.ToList();
-            dep.Add(new Department
-            {
-                DepartmentId = 0,
-                Name = "[ Select a Department ]"
-            });
-            //dep = dep.OrderBy(d => d.Name).ToList();
-            ViewBag.DepartmentId = new SelectList(dep.OrderBy(d => d.Name).ToList(), "DepartmentId", "Name");
-            */
-            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name");
-
-            return View();
+            
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", company.DepartmentId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", company.CityId);
+            return View(company);
         }
 
-        // GET: Cities/Edit/5
+        // GET: Companies/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            City city = db.Cities.Find(id);
-            if (city == null)
+            Company company = db.Companies.Find(id);
+            if (company == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", city.DepartmentId);
-            return View(city);
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", company.DepartmentId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", company.CityId);
+            return View(company);
         }
 
-        // POST: Cities/Edit/5
+        // POST: Companies/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "CityId,Name,DepartmentId")] City city)
+        public ActionResult Edit([Bind(Include = "CompanytId,Name,Phone,Address,Logo,DepartmentId,CityId")] Company company)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(city).State = EntityState.Modified;
+                db.Entry(company).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", city.DepartmentId);
-            return View(city);
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", company.DepartmentId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", company.CityId);
+            return View(company);
         }
 
-        // GET: Cities/Delete/5
+        // GET: Companies/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            City city = db.Cities.Find(id);
-            if (city == null)
+            Company company = db.Companies.Find(id);
+            if (company == null)
             {
                 return HttpNotFound();
             }
-            return View(city);
+            return View(company);
         }
 
-        // POST: Cities/Delete/5
+        // POST: Companies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            City city = db.Cities.Find(id);
-            db.Cities.Remove(city);
+            Company company = db.Companies.Find(id);
+            db.Companies.Remove(company);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

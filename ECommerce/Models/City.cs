@@ -16,6 +16,7 @@ namespace ECommerce.Models
         [Range(1, double.MaxValue, ErrorMessage ="Select a Department!")]
         public int DepartmentId { get; set; }
 
-        public virtual Department Department { get; set; }
+        public virtual Department Department { get; set; } //Porém, City não é uma lista para Department
+        public virtual ICollection<Company> Companies { get; set; } //City é uma lista dentro de Company
     }
 }
